@@ -50,7 +50,7 @@
         <p class="text-gray-500 mb-8">시작할 보드를 선택하거나 새로 만드세요.</p>
         
         <div id="personalBoardWarning" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-left">
-            <p class="font-bold">⚠️ 개인 보드 접속 제한</p>
+            <p class="font-bold"⚠️ 개인 보드 접속 제한</p>
             <p class="mt-1">로컬 파일(`file://`)에서는 보안상의 이유로 개인 보드 접속이 제한됩니다. 협업 보드를 이용해 주세요.</p>
         </div>
         
@@ -74,7 +74,7 @@
                 </p>
             </div>
             <button id="joinBoardButton" class="w-full px-6 py-3 bg-gray-500 text-white rounded-lg font-bold hover:bg-gray-600 transition duration-300">기존 보드에 참여</button>
-            <button id="personalBoardButton" class="w-full mt-4 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition duration-300">개인 보드로 접속</button>
+            <button id="personalBoardButton" class="w-full mt-4 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition duration-300 opacity-50 cursor-not-allowed" disabled>개인 보드로 접속</button>
         </div>
     </div>
     
@@ -240,11 +240,19 @@
             auth = getAuth(app);
             setLogLevel('debug');
 
+            // Listen for authentication state changes and enable the button when ready.
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
                     isAuthReady = true;
                     console.log("User signed in with ID:", userId);
+                    // Add a small delay to ensure the UI has rendered the authenticated state
+                    setTimeout(() => {
+                        if (window.location.protocol !== 'file:') {
+                            personalBoardButton.disabled = false;
+                            personalBoardButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        }
+                    }, 500);
                 } else {
                     try {
                         if (initialAuthToken) {
@@ -592,10 +600,7 @@
 
         // Personal board button
         personalBoardButton.addEventListener('click', async () => {
-            if (window.location.protocol === 'file:') {
-                showModal("로컬 파일에서는 개인 보드에 접속할 수 없습니다. 협업 보드를 이용해 주세요.");
-                return;
-            }
+            // Check if auth is ready before attempting to access
             if (!isAuthReady) {
                 showModal("인증 준비 중입니다. 잠시 후 다시 시도해주세요.");
                 return;
