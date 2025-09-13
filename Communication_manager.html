@@ -50,7 +50,7 @@
         <p class="text-gray-500 mb-8">시작할 보드를 선택하거나 새로 만드세요.</p>
         
         <div id="personalBoardWarning" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-left">
-            <p class="font-bold"⚠️ 개인 보드 접속 제한</p>
+            <p class="font-bold">⚠️ 개인 보드 접속 제한</p>
             <p class="mt-1">로컬 파일(`file://`)에서는 보안상의 이유로 개인 보드 접속이 제한됩니다. 협업 보드를 이용해 주세요.</p>
         </div>
         
@@ -164,21 +164,44 @@
     <!-- Firebase SDK Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, addDoc, onSnapshot, updateDoc, setLogLevel, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-        // Global variables setup
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        let userName = '김태양'; // User's name to be used for authoring and assignee
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJnT6FgIBNX3acYkIK5usVWuTgd0B4NHU",
+    authDomain: "communication-manager-v2.firebaseapp.com",
+    projectId: "communication-manager-v2",
+    storageBucket: "communication-manager-v2.firebasestorage.app",
+    messagingSenderId: "44832093872",
+    appId: "1:44832093872:web:6d12dae68fb0ba5cbdad75",
+    measurementId: "G-73LR37M0L3"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+        
+        const app = initializeApp(firebaseConfig);
+        const appId = firebaseConfig.projectId || 'default-app-id';
+        
+        let userName = '김태양';
         let isAuthReady = false;
         let db, auth, userId;
-        let unsubscribe = null; // Unsubscribe function for the realtime listener
-        let currentBoardData = []; // Global variable to store current board data
-        let autoSaveIntervalId = null; // For auto-save functionality
+        let unsubscribe = null;
+        let currentBoardData = [];
+        let autoSaveIntervalId = null;
 
-        // DOM elements
         const lobbyScreen = document.getElementById('lobby-screen');
         const appContainer = document.getElementById('app-container');
         const boardNameInput = document.getElementById('boardNameInput');
@@ -195,8 +218,6 @@
         const stopAutoSaveButton = document.getElementById('stopAutoSaveButton');
         const autoSaveStatus = document.getElementById('autoSaveStatus');
         const personalBoardWarning = document.getElementById('personalBoardWarning');
-
-        // Main App UI elements
         const boardMode = document.getElementById('boardMode');
         const boardIdDisplay = document.getElementById('boardIdDisplay');
         const sourceNameInput = document.getElementById('sourceNameInput');
@@ -215,7 +236,6 @@
         const modalMessage = document.getElementById('modalMessage');
         const modalClose = document.getElementById('modalClose');
 
-        // Function to show the modal (for general errors)
         function showModal(message) {
             modalMessage.textContent = message;
             modal.classList.remove('hidden');
@@ -225,28 +245,22 @@
             modal.classList.add('hidden');
         });
         
-        // Check if the app is running as a local file and show a warning
         if (window.location.protocol === 'file:') {
             personalBoardWarning.classList.remove('hidden');
             personalBoardButton.disabled = true;
             personalBoardButton.classList.add('opacity-50', 'cursor-not-allowed');
         }
 
-
-        // Firebase initialization
         try {
-            const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
             setLogLevel('debug');
 
-            // Listen for authentication state changes and enable the button when ready.
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
                     isAuthReady = true;
                     console.log("User signed in with ID:", userId);
-                    // Add a small delay to ensure the UI has rendered the authenticated state
                     setTimeout(() => {
                         if (window.location.protocol !== 'file:') {
                             personalBoardButton.disabled = false;
@@ -255,24 +269,17 @@
                     }, 500);
                 } else {
                     try {
-                        if (initialAuthToken) {
-                            await signInWithCustomToken(auth, initialAuthToken);
-                        } else {
-                            await signInAnonymously();
-                        }
+                        await signInAnonymously(auth);
                     } catch (error) {
                         console.error("Authentication error:", error);
-                        // showModal("인증 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
                     }
                 }
             });
 
         } catch (error) {
             console.error("Firebase initialization failed.", error);
-            // showModal("애플리케이션 초기화에 실패했습니다. 관리자에게 문의하세요.");
         }
 
-        // Function to update board info and switch UI
         function updateBoard(mode, id, collectionPath) {
             if (unsubscribe) {
                 unsubscribe();
@@ -282,20 +289,17 @@
             startRealtimeListener(collectionPath);
             lobbyScreen.classList.add('hidden');
             appContainer.classList.remove('hidden');
-            // Do not auto-fill the name input anymore
             if (assigneeInput) {
                 assigneeInput.value = userName;
             }
         }
         
-        // Function to create a communication card
         function createCommunicationCard(doc) {
             const data = doc.data();
             const card = document.createElement('div');
             card.id = `card-${doc.id}`;
             card.className = `card p-4 rounded-lg bg-white flex flex-col gap-2 ${data.status}`;
             
-            // Display and edit forms for data
             const displayHTML = `
                 <div class="flex items-center justify-between cursor-pointer collapsible-header">
                     <div class="flex-1">
@@ -310,7 +314,7 @@
                     <p><strong>번호:</strong> ${data.phone || '없음'}</p>
                     <p><strong>위치:</strong> ${data.where || '없음'}</p>
                     <p><strong>내용:</strong> ${data.what || '없음'}</p>
-                    <p class="text-xs text-gray-400 mt-2">요청 시간: ${new Date(data.timestamp.toDate()).toLocaleString('ko-KR')}</p>
+                    <p class="text-xs text-gray-400 mt-2">요청 시간: ${data.timestamp.toDate().toLocaleString('ko-KR')}</p>
                     <p class="text-xs text-gray-400">작성자: ${data.authorName || '익명'}</p>
                 </div>
             `;
@@ -325,7 +329,6 @@
                 </div>
             `;
             
-            // Status change and edit buttons
             const buttonHTML = `
                 <div class="flex gap-2 mt-2">
                     ${data.status === 'pending' ?
@@ -353,9 +356,8 @@
                 </div>
             `;
 
-            // Add event listener for collapsing/expanding
             card.querySelector('.collapsible-header').addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent card events from firing
+                e.stopPropagation();
                 const content = card.querySelector('.collapsible-content');
                 const icon = card.querySelector('.collapsible-icon');
                 content.classList.toggle('hidden');
@@ -364,7 +366,6 @@
             return card;
         }
 
-        // Firestore listener (real-time updates)
         function startRealtimeListener(collectionPath) {
             if (!isAuthReady) {
                 console.error("Authentication not ready. Cannot start listener.");
@@ -377,7 +378,6 @@
             unsubscribe = onSnapshot(communicationRef, (snapshot) => {
                 currentBoardData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // Clear existing lists
                 pendingList.innerHTML = '';
                 inProgressList.innerHTML = '';
                 completedList.innerHTML = '';
@@ -405,7 +405,6 @@
                 inProgressCount.textContent = inProgressCountVal;
                 completedCount.textContent = completedCountVal;
 
-                // Add event listeners to newly created buttons
                 document.querySelectorAll('.status-btn').forEach(button => {
                     button.addEventListener('click', async (e) => {
                         const newStatus = e.target.dataset.status;
@@ -488,36 +487,32 @@
             });
         }
 
-        // CSV download function
         function downloadAsCsv() {
             if (currentBoardData.length === 0) {
                 showModal("다운로드할 데이터가 없습니다.");
                 return;
             }
 
-            // Set CSV headers
             const headers = ["타임스탬프", "이름", "번호", "위치", "내용", "수신자", "상태", "작성자"];
             
-            // Format data for CSV
             const rows = currentBoardData.map(item => {
-                const timestamp = item.timestamp ? new Date(item.timestamp.toDate()).toLocaleString('ko-KR') : '';
-                const name = `"${item.name || ''}"`.replace(/"/g, '""');
-                const phone = `"${item.phone || ''}"`.replace(/"/g, '""');
-                const where = `"${item.where || ''}"`.replace(/"/g, '""');
-                const what = `"${item.what || ''}"`.replace(/"/g, '""');
-                const assignee = `"${item.assignee || ''}"`.replace(/"/g, '""');
-                const status = `"${item.status || ''}"`.replace(/"/g, '""');
-                const authorName = `"${item.authorName || ''}"`.replace(/"/g, '""');
+                const timestamp = item.timestamp ? item.timestamp.toDate().toLocaleString('ko-KR') : '';
+                const name = `"${(item.name || '').replace(/"/g, '""')}"`;
+                const phone = `"${(item.phone || '').replace(/"/g, '""')}"`;
+                const where = `"${(item.where || '').replace(/"/g, '""')}"`;
+                const what = `"${(item.what || '').replace(/"/g, '""')}"`;
+                const assignee = `"${(item.assignee || '').replace(/"/g, '""')}"`;
+                const status = `"${(item.status || '').replace(/"/g, '""')}"`;
+                const authorName = `"${(item.authorName || '').replace(/"/g, '""')}"`;
                 return [timestamp, name, phone, where, what, assignee, status, authorName].join(',');
             });
 
-            // Combine into a single CSV string
             const csvString = [
                 headers.join(','),
                 ...rows
             ].join('\n');
             
-            const BOM = "\uFEFF"; // Add BOM for Korean character support
+            const BOM = "\uFEff";
             const blob = new Blob([BOM + csvString], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -527,7 +522,6 @@
             document.body.removeChild(link);
         }
 
-        // Create a new board button
         createBoardButton.addEventListener('click', async () => {
             const boardName = boardNameInput.value.trim();
             if (boardName === '') {
@@ -544,16 +538,13 @@
             }
         
             try {
-                // Check if the board already exists
                 const publicCollectionPath = `artifacts/${appId}/public/data/${boardName}`;
                 const publicDocs = await getDocs(collection(db, publicCollectionPath));
         
                 if (publicDocs.empty) {
-                    // Board does not exist, so create a new one and navigate
                     updateBoard('협업 보드', boardName, publicCollectionPath);
                     console.log(`New board '${boardName}' created successfully.`);
                 } else {
-                    // Board already exists
                     boardNameError.textContent = "이미 존재하는 보드입니다. '기존 보드에 참여'를 이용해주세요.";
                     boardNameError.classList.remove('hidden');
                 }
@@ -563,7 +554,6 @@
             }
         });
 
-        // Join an existing board
         joinBoardButton.addEventListener('click', async () => {
             const boardName = joinBoardInput.value.trim();
             if (boardName === '') {
@@ -580,7 +570,6 @@
             }
         
             try {
-                // Check if the board exists
                 const publicCollectionPath = `artifacts/${appId}/public/data/${boardName}`;
                 const publicDocs = await getDocs(collection(db, publicCollectionPath));
         
@@ -592,15 +581,12 @@
                     console.log(`Joined existing board '${boardName}' successfully.`);
                 }
             } catch (error) {
-                console.error("Error joining board:", error);
+                console.error("보드 참여 중 오류 발생:", error);
                 showModal("보드 참여 중 오류가 발생했습니다.");
             }
         });
 
-
-        // Personal board button
         personalBoardButton.addEventListener('click', async () => {
-            // Check if auth is ready before attempting to access
             if (!isAuthReady) {
                 showModal("인증 준비 중입니다. 잠시 후 다시 시도해주세요.");
                 return;
@@ -609,7 +595,6 @@
             updateBoard('개인 보드', `사용자: ${userId.substring(0, 8)}...`, personalCollectionPath);
         });
 
-        // Add button to add new communication
         addButton.addEventListener('click', async () => {
             const name = sourceNameInput.value.trim();
             const phone = sourcePhoneInput.value.trim();
@@ -646,37 +631,31 @@
                 sourcePhoneInput.value = '';
                 whereInput.value = '';
                 whatInput.value = '';
-                // assigneeInput.value = userName; // Keep assignee name
             } catch (error) {
                 console.error("문서 추가 중 오류 발생:", error);
                 showModal("요청을 추가하는 중 오류가 발생했습니다.");
             }
         });
 
-        // Return to lobby button
         returnToLobbyButton.addEventListener('click', () => {
             lobbyScreen.classList.remove('hidden');
             appContainer.classList.add('hidden');
             if (unsubscribe) {
                 unsubscribe();
             }
-            // Clear input fields when returning to lobby
             boardNameInput.value = '';
             joinBoardInput.value = '';
             boardNameError.classList.add('hidden');
             joinBoardError.classList.add('hidden');
         });
 
-        // Download button listener
         downloadButton.addEventListener('click', downloadAsCsv);
 
-        // Auto-save functionality
         startAutoSaveButton.addEventListener('click', () => {
             if (autoSaveIntervalId) {
                 showModal("이미 자동 저장이 실행 중입니다.");
                 return;
             }
-
             const interval = parseInt(autoSaveIntervalSelect.value);
             autoSaveIntervalId = setInterval(() => {
                 autoSaveStatus.textContent = '자동 저장 완료!';
@@ -684,7 +663,6 @@
                     autoSaveStatus.textContent = '';
                 }, 2000);
             }, interval);
-
             startAutoSaveButton.classList.add('hidden');
             stopAutoSaveButton.classList.remove('hidden');
         });
@@ -698,11 +676,9 @@
                     autoSaveStatus.textContent = '';
                 }, 2000);
             }
-
             startAutoSaveButton.classList.remove('hidden');
             stopAutoSaveButton.classList.add('hidden');
         });
-
     </script>
 </body>
 </html>
