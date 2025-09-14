@@ -86,7 +86,7 @@
         <p class="text-gray-500 mb-8">시작할 보드를 선택하거나 새로 만드세요.</p>
         
         <!-- User Name Input -->
-        <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="mb-4 p-4 bg-blue-50 rounded-lg">
             <label class="block text-sm font-medium text-gray-700 mb-2">사용자 이름</label>
             <input type="text" id="userNameInput" placeholder="이름을 입력하세요" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
@@ -126,6 +126,20 @@
         </div>
     </div>
     
+    <!-- Admin Login Section -->
+    <div id="admin-login-screen" class="bg-white rounded-xl shadow-2xl p-6 md:p-10 w-full max-w-md text-center hidden">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">관리자 로그인</h2>
+        <p class="text-gray-500 mb-8">관리자 비밀번호를 입력하세요.</p>
+        <div>
+            <input type="password" id="adminPasswordInput" placeholder="비밀번호" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <p id="adminLoginError" class="error-message hidden">
+                <span class="error-icon">!</span> <span id="adminLoginErrorText">비밀번호가 올바르지 않습니다.</span>
+            </p>
+        </div>
+        <button id="adminLoginButton" class="w-full mt-4 px-6 py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition duration-300">로그인</button>
+        <button id="adminLoginCancelButton" class="w-full mt-2 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition duration-300">취소</button>
+    </div>
+
     <!-- Main Application UI -->
     <div id="app-container" class="bg-white rounded-xl shadow-2xl p-6 md:p-10 w-full max-w-6xl hidden relative">
         <!-- Header Section -->
@@ -140,6 +154,21 @@
             </svg>
             <span class="sr-only">홈 화면으로 돌아가기</span>
         </button>
+        
+        <!-- Admin Settings Button -->
+        <button id="adminButton" class="absolute top-4 right-4 px-4 py-2 bg-purple-600 text-white rounded-lg font-bold hidden hover:bg-purple-700 transition duration-300">
+            관리자 설정
+        </button>
+    
+        <!-- Archive Button -->
+        <button id="archiveButton" class="absolute top-4 right-20 px-3 py-3 rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition duration-300">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 4-6 5 8zm-8 4h8l-4-8-3 6-4-6-5 8z" clip-rule="evenodd" />
+            </svg>
+            <span class="sr-only">문서함</span>
+        </button>
+        <span id="archiveCount" class="absolute top-4 right-20 text-xs text-white bg-red-500 rounded-full px-2 py-1 translate-x-3 -translate-y-3 hidden">0</span>
+
     
         <!-- User/Collaboration ID Section -->
         <div class="mb-8 p-4 bg-yellow-100 text-yellow-800 rounded-lg text-sm text-center">
@@ -154,13 +183,19 @@
         </div>
     
         <!-- Add Communication Form -->
-        <div class="mb-8">
+        <div id="main-ui" class="mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input type="text" id="sourceNameInput" placeholder="이름" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" maxlength="50">
                 <input type="tel" id="sourcePhoneInput" placeholder="전화번호 (예: 010-1234-5678)" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" maxlength="20">
                 <input type="text" id="whereInput" placeholder="위치 (예: 무대 왼쪽)" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" maxlength="100">
+                <select id="eventInput" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="" disabled selected>행사 선택</option>
+                </select>
+                <select id="categoryInput" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="" disabled selected>문의 사항</option>
+                </select>
                 <input type="text" id="whatInput" placeholder="문제 내용 (예: 마이크 문제)" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" maxlength="200">
-                <input type="text" id="assigneeInput" placeholder="담당자" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none col-span-1 md:col-span-2" maxlength="50">
+                <input type="text" id="assigneeInput" placeholder="수신자" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none col-span-1 md:col-span-2" maxlength="50">
             </div>
             <button id="addButton" class="w-full mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span id="addButtonText">요청 추가</span>
@@ -168,9 +203,59 @@
             </button>
             <button id="downloadButton" class="w-full mt-2 px-6 py-3 bg-gray-400 text-white rounded-lg font-bold hover:bg-gray-500 transition duration-300">CSV로 다운로드</button>
         </div>
+        
+        <!-- Admin Settings Page -->
+        <div id="admin-settings" class="hidden">
+            <h2 class="text-2xl font-bold text-purple-600 mb-6">관리자 설정</h2>
+            
+            <!-- Event Management -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">행사 관리</h3>
+                <div class="flex items-center space-x-2 mb-4">
+                    <input type="text" id="newEventInput" placeholder="새 행사 이름 입력" class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="addEventButton" class="px-4 py-3 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition duration-300">추가</button>
+                </div>
+                <ul id="eventList" class="space-y-2 p-4 bg-gray-50 rounded-lg max-h-48 overflow-y-auto">
+                    <!-- Events will be dynamically added here -->
+                </ul>
+            </div>
 
+            <!-- Category Management -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">문의 사항 관리</h3>
+                <div class="flex items-center space-x-2 mb-4">
+                    <input type="text" id="newCategoryInput" placeholder="새 문의 사항 입력" class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="addCategoryButton" class="px-4 py-3 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition duration-300">추가</button>
+                </div>
+                <ul id="categoryList" class="space-y-2 p-4 bg-gray-50 rounded-lg max-h-48 overflow-y-auto">
+                    <!-- Categories will be dynamically added here -->
+                </ul>
+            </div>
+
+            <!-- User Management -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">사용자 관리</h3>
+                <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                    <p class="font-semibold mb-2">현재 접속 중인 사용자 목록 (ID):</p>
+                    <ul id="activeUserList" class="text-sm space-y-1 max-h-48 overflow-y-auto">
+                        <!-- Active users will be dynamically added here -->
+                    </ul>
+                </div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <input type="text" id="blockUserInput" placeholder="차단/해제할 사용자 ID 입력" class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="blockUserButton" class="px-4 py-3 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition duration-300">차단/해제</button>
+                </div>
+                <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                    <p class="font-semibold mb-2">차단된 사용자 목록:</p>
+                    <ul id="blockedUserList" class="text-sm space-y-1 max-h-48 overflow-y-auto">
+                        <!-- Blocked users will be dynamically added here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
         <!-- Statistics -->
-        <div class="mb-8 p-4 bg-gray-50 rounded-lg">
+        <div id="stats-section" class="mb-8 p-4 bg-gray-50 rounded-lg">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">통계</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                 <div class="bg-white p-3 rounded-lg">
@@ -212,6 +297,15 @@
                 <div id="completedList" class="space-y-4 min-h-[100px]"></div>
             </div>
         </div>
+        
+        <!-- Archived Items Page -->
+        <div id="archive-container" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">문서함</h2>
+            <p class="text-gray-500 mb-8">완료된 요청 기록을 확인하고 복원할 수 있습니다.</p>
+            <div id="archiveList" class="space-y-4 min-h-[100px]">
+                <!-- Archived cards will be dynamically added here -->
+            </div>
+        </div>
     
         <!-- Custom Modal for Alerts -->
         <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
@@ -225,32 +319,47 @@
     <!-- Firebase SDK Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, addDoc, onSnapshot, updateDoc, setLogLevel, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, collection, addDoc, onSnapshot, updateDoc, setLogLevel, getDocs, serverTimestamp, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Firebase 설정
-        const firebaseConfig = {
-          apiKey: "AIzaSyCJnT6FgIBNX3acYkIK5usVWuTgd0B4NHU",
-          authDomain: "communication-manager-v2.firebaseapp.com",
-          projectId: "communication-manager-v2",
-          storageBucket: "communication-manager-v2.firebasestorage.app",
-          messagingSenderId: "44832093872",
-          appId: "1:44832093872:web:6d12dae68fb0ba5cbdad75",
-          measurementId: "G-73LR37M0L3"
-        };
+        // 여기에 Firebase 콘솔에서 복사한 <script> 태그 안의 코드를 붙여넣으세요.
+        // 이 코드는 firebaseConfig 객체와 initializeApp() 함수를 포함해야 합니다.
+        // 예시:
+        // const firebaseConfig = {
+        //   apiKey: "your-api-key",
+        //   authDomain: "your-project-id.firebaseapp.com",
+        //   projectId: "your-project-id",
+        //   storageBucket: "your-project-id.appspot.com",
+        //   messagingSenderId: "your-messaging-sender-id",
+        //   appId: "your-app-id"
+        // };
         
-        const app = initializeApp(firebaseConfig);
-        const appId = firebaseConfig.projectId;
+        // const app = initializeApp(firebaseConfig);
+        
+        
+        const ADMIN_PASSWORD = "4301xodid"; 
         
         let userName = localStorage.getItem('communicationManagerUserName') || '';
         let isAuthReady = false;
-        let db, auth, userId;
+        let db, auth, userId, userRole;
         let unsubscribe = null;
         let currentBoardData = [];
         let currentCollectionPath = '';
+        let categories = ['[소리]', '[조명]', '[무대]', '[안전]', '[기타]'];
+        let events = ["페스티벌_시월_2025", "컨퍼런스_2026", "워크샵_2025"];
+        let blockedUsers = [];
+        
+        const app = initializeApp({}); // Dummy init for local file, replaced by user's config
+        const appId = 'default-app-id';
 
         // DOM Elements
         const lobbyScreen = document.getElementById('lobby-screen');
+        const adminLoginScreen = document.getElementById('admin-login-screen');
+        const adminPasswordInput = document.getElementById('adminPasswordInput');
+        const adminLoginError = document.getElementById('adminLoginError');
+        const adminLoginErrorText = document.getElementById('adminLoginErrorText');
+        const adminLoginButton = document.getElementById('adminLoginButton');
+        const adminLoginCancelButton = document.getElementById('adminLoginCancelButton');
         const appContainer = document.getElementById('app-container');
         const userNameInput = document.getElementById('userNameInput');
         const boardNameInput = document.getElementById('boardNameInput');
@@ -276,6 +385,8 @@
         const sourceNameInput = document.getElementById('sourceNameInput');
         const sourcePhoneInput = document.getElementById('sourcePhoneInput');
         const whereInput = document.getElementById('whereInput');
+        const eventInput = document.getElementById('eventInput');
+        const categoryInput = document.getElementById('categoryInput');
         const whatInput = document.getElementById('whatInput');
         const assigneeInput = document.getElementById('assigneeInput');
         const addButton = document.getElementById('addButton');
@@ -296,6 +407,35 @@
         const modalClose = document.getElementById('modalClose');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
+        const adminButton = document.getElementById('adminButton');
+        const archiveButton = document.getElementById('archiveButton');
+        const archiveCount = document.getElementById('archiveCount');
+        const mainUI = document.getElementById('main-ui');
+        const adminSettings = document.getElementById('admin-settings');
+        const statsSection = document.getElementById('stats-section');
+        const statusContainer = document.getElementById('statusContainer');
+        const eventChartCanvas = document.getElementById('eventChart');
+        const categoryChartCanvas = document.getElementById('categoryChart');
+        const newEventInput = document.getElementById('newEventInput');
+        const addEventButton = document.getElementById('addEventButton');
+        const eventList = document.getElementById('eventList');
+        const newCategoryInput = document.getElementById('newCategoryInput');
+        const addCategoryButton = document.getElementById('addCategoryButton');
+        const categoryList = document.getElementById('categoryList');
+        const activeUserList = document.getElementById('activeUserList');
+        const blockUserInput = document.getElementById('blockUserInput');
+        const blockUserButton = document.getElementById('blockUserButton');
+        const blockedUserList = document.getElementById('blockedUserList');
+        const archiveContainer = document.getElementById('archive-container');
+        const archiveList = document.getElementById('archiveList');
+        const mainUiControls = document.getElementById('main-ui-controls');
+
+        // Chart.js global config
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.font.size = 12;
+        Chart.defaults.color = '#4b5563';
+        
+        let eventChart, categoryChart;
 
         // Utility Functions
         function showNotification(message, isError = false) {
@@ -331,7 +471,94 @@
                 statusText.textContent = '연결 끊김';
             }
         }
+        
+        function updateCharts(data) {
+            const eventCounts = {};
+            const categoryCounts = {};
+            
+            data.forEach(item => {
+                const event = item.event || '기타';
+                const category = item.category || '기타';
+                
+                eventCounts[event] = (eventCounts[event] || 0) + 1;
+                categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+            });
+            
+            if (eventChart) {
+                eventChart.data.labels = Object.keys(eventCounts);
+                eventChart.data.datasets[0].data = Object.values(eventCounts);
+                eventChart.update();
+            } else {
+                eventChart = new Chart(eventChartCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(eventCounts),
+                        datasets: [{
+                            label: '요청 수',
+                            data: Object.values(eventCounts),
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#2563eb',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: '행사별 요청' }
+                        },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+            
+            if (categoryChart) {
+                categoryChart.data.labels = Object.keys(categoryCounts);
+                categoryChart.data.datasets[0].data = Object.values(categoryCounts);
+                categoryChart.update();
+            } else {
+                categoryChart = new Chart(categoryChartCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(categoryCounts),
+                        datasets: [{
+                            label: '요청 수',
+                            data: Object.values(categoryCounts),
+                            backgroundColor: [
+                                '#f97316', '#3b82f6', '#10b981', '#6b7280', '#9ca3af'
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: { display: true, text: '분류별 요청' }
+                        }
+                    }
+                });
+            }
+        }
 
+        async function loadArchiveData() {
+            if (!currentCollectionPath) return;
+            const archiveRef = collection(db, `${currentCollectionPath}/archive`);
+            const archiveDocs = await getDocs(archiveRef);
+            archiveList.innerHTML = '';
+            let count = 0;
+            archiveDocs.forEach(doc => {
+                const card = createCommunicationCard(doc);
+                archiveList.appendChild(card);
+                count++;
+            });
+            if (count > 0) {
+                archiveCount.textContent = count;
+                archiveCount.classList.remove('hidden');
+            } else {
+                archiveCount.classList.add('hidden');
+            }
+        }
+        
         modalClose.addEventListener('click', () => {
             modal.classList.add('hidden');
         });
@@ -349,24 +576,62 @@
         if (window.location.protocol === 'file:') {
             personalBoardWarning.classList.remove('hidden');
             personalBoardButton.disabled = true;
+            personalBoardButton.classList.add('opacity-50', 'cursor-not-allowed');
         }
 
+        // Firebase initialization
+        let firebaseApp, db, auth;
         try {
-            db = getFirestore(app);
-            auth = getAuth(app);
-            setLogLevel('silent');
+            // 사용자 파이어베이스 설정 코드가 있을 경우
+            // eslint-disable-next-line no-undef
+            if (typeof firebaseConfig !== 'undefined') {
+                // eslint-disable-next-line no-undef
+                firebaseApp = initializeApp(firebaseConfig);
+                db = getFirestore(firebaseApp);
+                auth = getAuth(firebaseApp);
+                setLogLevel('silent');
+            } else {
+                throw new Error("Firebase configuration not found.");
+            }
+        } catch (error) {
+            console.error("Firebase 초기화 실패:", error);
+            showNotification("Firebase 연결에 실패했습니다.", true);
+            updateConnectionStatus(false);
+            isAuthReady = false;
+        }
 
+        if (auth) {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
                     isAuthReady = true;
                     console.log("사용자 인증 완료:", userId);
                     updateConnectionStatus(true);
-                    setTimeout(() => {
-                        if (window.location.protocol !== 'file:') {
+                    
+                    userRole = userId === ADMIN_USER_ID ? 'admin' : 'user';
+
+                    await loadDynamicSettings();
+
+                    const isUserBlocked = blockedUsers.includes(userId);
+                    if (isUserBlocked && userRole !== 'admin') {
+                        showNotification("차단된 사용자입니다. 관리자에게 문의하세요.", true);
+                        createBoardButton.disabled = true;
+                        joinBoardButton.disabled = true;
+                        personalBoardButton.disabled = true;
+                    }
+                    
+                    if (userRole === 'admin') {
+                        adminButton.classList.remove('hidden');
+                    } else {
+                        adminButton.classList.add('hidden');
+                    }
+
+                    if (window.location.protocol !== 'file:') {
+                        setTimeout(() => {
                             personalBoardButton.disabled = false;
-                        }
-                    }, 500);
+                            personalBoardButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        }, 500);
+                    }
                 } else {
                     try {
                         await signInAnonymously(auth);
@@ -377,14 +642,192 @@
                     }
                 }
             });
-
-        } catch (error) {
-            console.error("Firebase 초기화 실패:", error);
-            showNotification("Firebase 연결에 실패했습니다.", true);
-            updateConnectionStatus(false);
         }
 
-        function updateBoard(mode, id, collectionPath) {
+        
+        async function loadDynamicSettings() {
+            if (!db) return;
+            const eventDocRef = doc(db, `artifacts/${appId}/public/settings/events`);
+            const eventDocSnap = await getDoc(eventDocRef);
+            if (eventDocSnap.exists()) {
+                events = eventDocSnap.data().list || events;
+            } else {
+                await setDoc(eventDocRef, { list: events });
+            }
+            updateEventSelects();
+            updateEventListUI();
+
+            const categoryDocRef = doc(db, `artifacts/${appId}/public/settings/categories`);
+            const categoryDocSnap = await getDoc(categoryDocRef);
+            if (categoryDocSnap.exists()) {
+                categories = categoryDocSnap.data().list || categories;
+            } else {
+                await setDoc(categoryDocRef, { list: categories });
+            }
+            updateCategorySelects();
+            updateCategoryListUI();
+            
+            const blockedUserDocRef = doc(db, `artifacts/${appId}/public/settings/blocked_users`);
+            const blockedUserDocSnap = await getDoc(blockedUserDocRef);
+            if (blockedUserDocSnap.exists()) {
+                blockedUsers = blockedUserDocSnap.data().list || [];
+            } else {
+                await setDoc(blockedUserDocRef, { list: [] });
+            }
+            updateBlockedUserListUI();
+        }
+
+        async function saveCategories() {
+            const docRef = doc(db, `artifacts/${appId}/public/settings/categories`);
+            await setDoc(docRef, { list: categories });
+            updateCategorySelects();
+            updateCategoryListUI();
+        }
+        
+        async function saveEvents() {
+            const docRef = doc(db, `artifacts/${appId}/public/settings/events`);
+            await setDoc(docRef, { list: events });
+            updateEventSelects();
+            updateEventListUI();
+        }
+
+        function updateCategorySelects() {
+            const selects = document.querySelectorAll('#categoryInput, select[id^="edit-category-"]');
+            selects.forEach(select => {
+                const selectedValue = select.value;
+                select.innerHTML = '<option value="" disabled selected>문의 사항</option>';
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    select.appendChild(option);
+                });
+                select.value = selectedValue || '';
+            });
+        }
+
+        function updateCategoryListUI() {
+            categoryList.innerHTML = '';
+            categories.forEach(cat => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between p-2 rounded-lg bg-white shadow-sm';
+                li.innerHTML = `
+                    <span>${cat}</span>
+                    <button data-category="${cat}" class="remove-category-btn text-red-500 hover:text-red-700 font-bold text-sm">삭제</button>
+                `;
+                categoryList.appendChild(li);
+            });
+            document.querySelectorAll('.remove-category-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if (userRole !== 'admin') return showNotification("관리자만 삭제할 수 있습니다.", true);
+                    const catToRemove = e.target.dataset.category;
+                    categories = categories.filter(cat => cat !== catToRemove);
+                    await saveCategories();
+                    showNotification(`${catToRemove} 분류가 삭제되었습니다.`);
+                });
+            });
+        }
+        
+        function updateEventSelects() {
+            const selects = document.querySelectorAll('#eventInput, select[id^="edit-event-"]');
+            selects.forEach(select => {
+                const selectedValue = select.value;
+                select.innerHTML = '<option value="" disabled selected>행사 선택</option>';
+                events.forEach(event => {
+                    const option = document.createElement('option');
+                    option.value = event;
+                    option.textContent = event;
+                    select.appendChild(option);
+                });
+                select.value = selectedValue || '';
+            });
+        }
+
+        function updateEventListUI() {
+            eventList.innerHTML = '';
+            events.forEach(event => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between p-2 rounded-lg bg-white shadow-sm';
+                li.innerHTML = `
+                    <span>${event}</span>
+                    <button data-event="${event}" class="remove-event-btn text-red-500 hover:text-red-700 font-bold text-sm">삭제</button>
+                `;
+                eventList.appendChild(li);
+            });
+            document.querySelectorAll('.remove-event-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if (userRole !== 'admin') return showNotification("관리자만 삭제할 수 있습니다.", true);
+                    const eventToRemove = e.target.dataset.event;
+                    events = events.filter(event => event !== eventToRemove);
+                    await saveEvents();
+                    showNotification(`${eventToRemove} 행사가 삭제되었습니다.`);
+                });
+            });
+        }
+
+
+        function updateActiveUserListUI(activeUsers) {
+            activeUserList.innerHTML = '';
+            if (activeUsers.length === 0) {
+                activeUserList.innerHTML = '<li class="text-gray-500">접속 중인 사용자가 없습니다.</li>';
+                return;
+            }
+            activeUsers.forEach(user => {
+                const li = document.createElement('li');
+                li.className = 'p-2 rounded-lg bg-white shadow-sm';
+                li.textContent = user.id;
+                activeUserList.appendChild(li);
+            });
+        }
+
+        async function loadBlockedUsers() {
+            const docRef = doc(db, `artifacts/${appId}/public/settings/blocked_users`);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                blockedUsers = docSnap.data().list || [];
+            } else {
+                blockedUsers = [];
+            }
+            updateBlockedUserListUI();
+        }
+
+        async function saveBlockedUsers() {
+            const docRef = doc(db, `artifacts/${appId}/public/settings/blocked_users`);
+            await setDoc(docRef, { list: blockedUsers });
+            updateBlockedUserListUI();
+        }
+
+        function updateBlockedUserListUI() {
+            blockedUserList.innerHTML = '';
+            if (blockedUsers.length === 0) {
+                blockedUserList.innerHTML = '<li class="text-gray-500">차단된 사용자가 없습니다.</li>';
+                return;
+            }
+            blockedUsers.forEach(uid => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between p-2 rounded-lg bg-white shadow-sm';
+                li.innerHTML = `
+                    <span>${uid}</span>
+                    <button data-uid="${uid}" class="unblock-user-btn text-green-500 hover:text-green-700 font-bold text-sm">차단 해제</button>
+                `;
+                blockedUserList.appendChild(li);
+            });
+            document.querySelectorAll('.unblock-user-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if (userRole !== 'admin') return showNotification("관리자만 차단 해제할 수 있습니다.", true);
+                    const uidToUnblock = e.target.dataset.uid;
+                    blockedUsers = blockedUsers.filter(uid => uid !== uidToUnblock);
+                    await saveBlockedUsers();
+                    showNotification(`사용자 ${uidToUnblock}의 차단이 해제되었습니다.`);
+                });
+            });
+        }
+        
+        async function updateBoard(mode, id, collectionPath) {
+            if (!isAuthReady) {
+                showNotification("인증이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.", true);
+                return;
+            }
             if (unsubscribe) {
                 unsubscribe();
             }
@@ -392,11 +835,31 @@
             boardMode.textContent = mode;
             boardIdDisplay.textContent = id;
             currentUser.textContent = userName || '익명';
+            
+            const isUserBlocked = blockedUsers.includes(userId);
+            if (isUserBlocked && userRole !== 'admin') {
+                showNotification("차단된 사용자입니다. 관리자에게 문의하세요.", true);
+                appContainer.querySelector('#main-ui').classList.add('hidden');
+                appContainer.querySelector('#stats-section').classList.add('hidden');
+                appContainer.querySelector('#statusContainer').classList.add('hidden');
+                return;
+            }
+            appContainer.querySelector('#main-ui').classList.remove('hidden');
+            appContainer.querySelector('#stats-section').classList.remove('hidden');
+            appContainer.querySelector('#statusContainer').classList.remove('hidden');
+
             startRealtimeListener(collectionPath);
+            await loadArchiveData();
             lobbyScreen.classList.add('hidden');
             appContainer.classList.remove('hidden');
+            archiveContainer.classList.add('hidden');
             if (assigneeInput && userName) {
                 assigneeInput.value = userName;
+            }
+            if (userRole === 'admin') {
+                adminButton.classList.remove('hidden');
+            } else {
+                adminButton.classList.add('hidden');
             }
         }
         
@@ -406,14 +869,16 @@
             card.id = `card-${doc.id}`;
             card.className = `card p-4 rounded-lg bg-white flex flex-col gap-2 ${data.status}`;
             
-            const timeAgo = data.timestamp ? getTimeAgo(data.timestamp.toDate()) : '';
+            const statusUpdateTimestamp = data.timestamp ? getTimeAgo(data.timestamp.toDate()) : '';
             
             const displayHTML = `
                 <div class="flex items-center justify-between cursor-pointer collapsible-header">
                     <div class="flex-1">
                         <p class="font-bold text-gray-800">이름: ${sanitizeInput(data.name || '없음')}</p>
-                        <p class="text-sm text-gray-400">담당자: ${sanitizeInput(data.assignee || '미지정')}</p>
-                        ${timeAgo ? `<p class="text-xs text-gray-400">${timeAgo}</p>` : ''}
+                        <p class="text-sm text-gray-400">수신자: ${sanitizeInput(data.assignee || '미지정')}</p>
+                        <p class="text-sm text-gray-400">행사: ${sanitizeInput(data.event || '없음')}</p>
+                        <p class="text-sm text-gray-400">분류: ${sanitizeInput(data.category || '없음')}</p>
+                        ${statusUpdateTimestamp ? `<p class="text-xs text-gray-400 mt-2">업데이트: ${statusUpdateTimestamp}</p>` : ''}
                     </div>
                     <svg class="w-5 h-5 ml-2 text-gray-400 transform transition-transform duration-300 collapsible-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -423,8 +888,11 @@
                     <p><strong>전화번호:</strong> ${sanitizeInput(data.phone || '없음')}</p>
                     <p><strong>위치:</strong> ${sanitizeInput(data.where || '없음')}</p>
                     <p><strong>내용:</strong> ${sanitizeInput(data.what || '없음')}</p>
-                    ${data.timestamp ? `<p class="text-xs text-gray-400 mt-2">요청 시간: ${data.timestamp.toDate().toLocaleString('ko-KR')}</p>` : ''}
+                    ${data.pendingTimestamp ? `<p class="text-xs text-gray-400 mt-2">새 요청: ${data.pendingTimestamp.toDate().toLocaleString('ko-KR')}</p>` : ''}
+                    ${data.inProgressTimestamp ? `<p class="text-xs text-gray-400">진행 중: ${data.inProgressTimestamp.toDate().toLocaleString('ko-KR')}</p>` : ''}
+                    ${data.completedTimestamp ? `<p class="text-xs text-gray-400">완료: ${data.completedTimestamp.toDate().toLocaleString('ko-KR')}</p>` : ''}
                     <p class="text-xs text-gray-400">작성자: ${sanitizeInput(data.authorName || '익명')}</p>
+                    ${userRole === 'admin' ? `<p class="text-xs text-gray-400">사용자 ID: ${sanitizeInput(data.authorId || '알 수 없음')}</p>` : ''}
                 </div>
             `;
             
@@ -433,8 +901,16 @@
                     <input type="text" id="edit-name-${doc.id}" value="${sanitizeInput(data.name || '')}" placeholder="이름" class="p-2 border rounded text-sm" maxlength="50">
                     <input type="tel" id="edit-phone-${doc.id}" value="${sanitizeInput(data.phone || '')}" placeholder="전화번호" class="p-2 border rounded text-sm" maxlength="20">
                     <input type="text" id="edit-where-${doc.id}" value="${sanitizeInput(data.where || '')}" placeholder="위치" class="p-2 border rounded text-sm" maxlength="100">
+                    <select id="edit-event-${doc.id}" class="p-2 border rounded text-sm">
+                        <option value="" disabled selected>행사 선택</option>
+                        ${events.map(event => `<option value="${event}">${event}</option>`).join('')}
+                    </select>
+                    <select id="edit-category-${doc.id}" class="p-2 border rounded text-sm">
+                        <option value="" disabled selected>문의 사항</option>
+                        ${categories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                    </select>
                     <input type="text" id="edit-what-${doc.id}" value="${sanitizeInput(data.what || '')}" placeholder="내용" class="p-2 border rounded text-sm" maxlength="200">
-                    <input type="text" id="edit-assignee-${doc.id}" value="${sanitizeInput(data.assignee || '')}" placeholder="담당자" class="p-2 border rounded text-sm" maxlength="50">
+                    <input type="text" id="edit-assignee-${doc.id}" value="${sanitizeInput(data.assignee || '')}" placeholder="수신자" class="p-2 border rounded text-sm" maxlength="50">
                 </div>
             `;
             
@@ -447,7 +923,12 @@
                         `<button data-status="completed" data-id="${doc.id}" class="status-btn px-4 py-2 bg-green-500 text-white rounded-full text-xs font-semibold hover:bg-green-600 transition duration-200">완료로</button>` : ''
                     }
                     ${data.status === 'completed' ?
-                        `<span class="text-xs text-green-600 bg-green-100 py-1 px-3 rounded-full">처리 완료됨</span>` : ''
+                        `<button data-id="${doc.id}" class="archive-btn px-4 py-2 bg-gray-500 text-white rounded-full text-xs font-semibold hover:bg-gray-600 transition duration-200">
+                            <svg class="w-4 h-4 inline-block -mt-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 4-6 5 8zm-8 4h8l-4-8-3 6-4-6-5 8z" clip-rule="evenodd" />
+                            </svg>
+                            문서함에 보관
+                        </button>` : ''
                     }
                     ${data.status !== 'completed' ?
                         `<button class="edit-btn px-4 py-2 bg-gray-500 text-white rounded-full text-xs font-semibold hover:bg-gray-600 transition duration-200" data-id="${doc.id}">수정</button>` : ''
@@ -472,6 +953,16 @@
                 content.classList.toggle('hidden');
                 icon.classList.toggle('rotate-180');
             });
+            
+            const editCategorySelect = card.querySelector(`#edit-category-${doc.id}`);
+            if (editCategorySelect) {
+                editCategorySelect.value = data.category || '';
+            }
+            const editEventSelect = card.querySelector(`#edit-event-${doc.id}`);
+            if (editEventSelect) {
+                editEventSelect.value = data.event || '';
+            }
+
             return card;
         }
 
@@ -503,7 +994,6 @@
             unsubscribe = onSnapshot(communicationRef, (snapshot) => {
                 currentBoardData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // 기존 이벤트 리스너 제거를 위해 내용을 완전히 교체
                 pendingList.innerHTML = '';
                 inProgressList.innerHTML = '';
                 completedList.innerHTML = '';
@@ -527,8 +1017,33 @@
                         completedCountVal++;
                     }
                 });
+                
+                // Sort lists by timestamp in descending order
+                const sortedPending = Array.from(pendingList.children).sort((a, b) => {
+                    const aTimestamp = currentBoardData.find(d => d.id === a.id).timestamp.toDate().getTime();
+                    const bTimestamp = currentBoardData.find(d => d.id === b.id).timestamp.toDate().getTime();
+                    return bTimestamp - aTimestamp;
+                });
+                pendingList.innerHTML = '';
+                sortedPending.forEach(card => pendingList.appendChild(card));
+                
+                const sortedInProgress = Array.from(inProgressList.children).sort((a, b) => {
+                    const aTimestamp = currentBoardData.find(d => d.id === a.id).timestamp.toDate().getTime();
+                    const bTimestamp = currentBoardData.find(d => d.id === b.id).timestamp.toDate().getTime();
+                    return bTimestamp - aTimestamp;
+                });
+                inProgressList.innerHTML = '';
+                sortedInProgress.forEach(card => inProgressList.appendChild(card));
+                
+                const sortedCompleted = Array.from(completedList.children).sort((a, b) => {
+                    const aTimestamp = currentBoardData.find(d => d.id === a.id).timestamp.toDate().getTime();
+                    const bTimestamp = currentBoardData.find(d => d.id === b.id).timestamp.toDate().getTime();
+                    return bTimestamp - aTimestamp;
+                });
+                completedList.innerHTML = '';
+                sortedCompleted.forEach(card => completedList.appendChild(card));
 
-                // 카운터 업데이트
+
                 pendingCount.textContent = pendingCountVal;
                 inProgressCount.textContent = inProgressCountVal;
                 completedCount.textContent = completedCountVal;
@@ -536,8 +1051,7 @@
                 totalInProgress.textContent = inProgressCountVal;
                 totalCompleted.textContent = completedCountVal;
                 totalRequests.textContent = pendingCountVal + inProgressCountVal + completedCountVal;
-
-                // 이벤트 리스너 재등록
+                
                 attachEventListeners();
                 
             }, (error) => {
@@ -548,7 +1062,6 @@
         }
 
         function attachEventListeners() {
-            // 상태 변경 버튼
             document.querySelectorAll('.status-btn').forEach(button => {
                 button.addEventListener('click', async (e) => {
                     const newStatus = e.target.dataset.status;
@@ -558,13 +1071,21 @@
                         return;
                     }
                     
-                    // 버튼 비활성화
                     button.disabled = true;
                     button.style.opacity = '0.5';
                     
                     try {
                         const communicationDocRef = doc(db, `${currentCollectionPath}/${docId}`);
-                        await updateDoc(communicationDocRef, { status: newStatus });
+                        const updateData = {
+                            status: newStatus,
+                            timestamp: serverTimestamp()
+                        };
+                        
+                        if (newStatus === 'pending') updateData.pendingTimestamp = serverTimestamp();
+                        else if (newStatus === 'in_progress') updateData.inProgressTimestamp = serverTimestamp();
+                        else if (newStatus === 'completed') updateData.completedTimestamp = serverTimestamp();
+
+                        await updateDoc(communicationDocRef, updateData);
                         console.log(`문서 ${docId}의 상태가 ${newStatus}로 변경됨`);
                         showNotification("상태가 성공적으로 변경되었습니다.");
                     } catch (error) {
@@ -576,7 +1097,6 @@
                 });
             });
 
-            // 수정 버튼
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const docId = e.target.dataset.id;
@@ -594,7 +1114,6 @@
                 });
             });
 
-            // 저장 버튼
             document.querySelectorAll('.save-btn').forEach(button => {
                 button.addEventListener('click', async (e) => {
                     const docId = e.target.dataset.id;
@@ -602,11 +1121,12 @@
                     const name = sanitizeInput(cardElement.querySelector(`#edit-name-${docId}`).value.trim());
                     const phone = sanitizeInput(cardElement.querySelector(`#edit-phone-${docId}`).value.trim());
                     const where = sanitizeInput(cardElement.querySelector(`#edit-where-${docId}`).value.trim());
+                    const event = sanitizeInput(cardElement.querySelector(`#edit-event-${docId}`).value.trim());
+                    const category = sanitizeInput(cardElement.querySelector(`#edit-category-${docId}`).value.trim());
                     const what = sanitizeInput(cardElement.querySelector(`#edit-what-${docId}`).value.trim());
                     const assignee = sanitizeInput(cardElement.querySelector(`#edit-assignee-${docId}`).value.trim());
                     
-                    // 유효성 검사
-                    if (!name || !phone || !where || !what || !assignee) {
+                    if (!name || !phone || !where || !what || !assignee || !event || !category) {
                         showNotification("모든 필드를 입력해주세요.", true);
                         return;
                     }
@@ -616,14 +1136,13 @@
                         return;
                     }
                     
-                    // 버튼 비활성화
                     button.disabled = true;
                     button.textContent = '저장 중...';
                     
                     try {
                         const communicationDocRef = doc(db, `${currentCollectionPath}/${docId}`);
                         await updateDoc(communicationDocRef, {
-                            name, phone, where, what, assignee
+                            name, phone, where, what, assignee, event, category
                         });
                         showNotification("요청이 성공적으로 수정되었습니다.");
                         console.log(`문서 ${docId} 수정 완료`);
@@ -636,7 +1155,6 @@
                 });
             });
 
-            // 취소 버튼
             document.querySelectorAll('.cancel-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const docId = e.target.dataset.id;
@@ -653,6 +1171,32 @@
                     statusButtons.forEach(btn => btn.classList.remove('hidden'));
                 });
             });
+            
+            document.querySelectorAll('.archive-btn').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const docId = e.target.dataset.id;
+                    if (!docId) {
+                        showNotification("문서 ID를 찾을 수 없습니다.", true);
+                        return;
+                    }
+                    
+                    try {
+                        const communicationDocRef = doc(db, `${currentCollectionPath}/${docId}`);
+                        const docSnap = await getDoc(communicationDocRef);
+                        const data = docSnap.data();
+                        
+                        const archiveDocRef = doc(db, `${currentCollectionPath}/archive`, docId);
+                        await setDoc(archiveDocRef, data);
+                        await deleteDoc(communicationDocRef);
+                        
+                        showNotification("요청이 문서함으로 이동되었습니다.");
+                        loadArchiveData();
+                    } catch (error) {
+                        console.error("문서함 이동 중 오류:", error);
+                        showNotification("문서함 이동 중 오류가 발생했습니다.", true);
+                    }
+                });
+            });
         }
 
         function downloadAsCsv() {
@@ -661,7 +1205,7 @@
                 return;
             }
 
-            const headers = ["타임스탬프", "이름", "전화번호", "위치", "내용", "담당자", "상태", "작성자"];
+            const headers = ["타임스탬프", "이름", "전화번호", "위치", "내용", "담당자", "상태", "작성자", "행사", "분류"];
             
             const rows = currentBoardData.map(item => {
                 const timestamp = item.timestamp ? item.timestamp.toDate().toLocaleString('ko-KR') : '';
@@ -674,7 +1218,9 @@
                                  item.status === 'in_progress' ? '진행 중' : '완료';
                 const status = `"${statusText}"`;
                 const authorName = `"${(item.authorName || '').replace(/"/g, '""')}"`;
-                return [timestamp, name, phone, where, what, assignee, status, authorName].join(',');
+                const event = `"${(item.event || '').replace(/"/g, '""')}"`;
+                const category = `"${(item.category || '').replace(/"/g, '""')}"`;
+                return [timestamp, name, phone, where, what, assignee, status, authorName, event, category].join(',');
             });
 
             const csvString = [
@@ -777,7 +1323,7 @@
             joinBoardError.classList.add('hidden');
         
             if (!isAuthReady) {
-                showNotification("인증 준비 중입니다. 잠시 후 다시 시도해주세요.", true);
+                showModal("인증 준비 중입니다. 잠시 후 다시 시도해주세요.");
                 return;
             }
         
@@ -802,7 +1348,7 @@
                 setButtonLoading(joinBoardButton, joinBoardText, joinBoardSpinner, false);
             }
         });
-
+        
         personalBoardButton.addEventListener('click', async () => {
             if (!userName.trim()) {
                 showNotification("사용자 이름을 입력해주세요.", true);
@@ -819,14 +1365,86 @@
             showNotification("개인 보드에 접속했습니다.");
         });
 
+        adminLoginButton.addEventListener('click', async () => {
+            const password = adminPasswordInput.value;
+            if (password === ADMIN_PASSWORD) {
+                await updateBoard('관리자 보드', '관리자', 'artifacts/admin-board/communications');
+                showNotification("관리자 모드로 접속했습니다.");
+            } else {
+                adminLoginErrorText.textContent = "비밀번호가 올바르지 않습니다.";
+                adminLoginError.classList.remove('hidden');
+            }
+        });
+
+        adminLoginCancelButton.addEventListener('click', () => {
+            adminLoginScreen.classList.add('hidden');
+            lobbyScreen.classList.remove('hidden');
+        });
+
+        adminButton.addEventListener('click', () => {
+            if (userRole === 'admin') {
+                mainUI.classList.add('hidden');
+                statsSection.classList.add('hidden');
+                statusContainer.classList.add('hidden');
+                adminSettings.classList.remove('hidden');
+                adminButton.classList.add('hidden');
+                archiveButton.classList.add('hidden');
+            }
+        });
+
+        archiveButton.addEventListener('click', () => {
+            mainUI.classList.add('hidden');
+            statsSection.classList.add('hidden');
+            statusContainer.classList.add('hidden');
+            adminSettings.classList.add('hidden');
+            archiveContainer.classList.remove('hidden');
+            archiveButton.classList.add('hidden');
+        });
+
+        returnToLobbyButton.addEventListener('click', () => {
+            lobbyScreen.classList.remove('hidden');
+            appContainer.classList.add('hidden');
+            mainUI.classList.remove('hidden');
+            adminSettings.classList.add('hidden');
+            archiveContainer.classList.add('hidden');
+            if (unsubscribe) {
+                unsubscribe();
+            }
+            
+            boardNameInput.value = '';
+            joinBoardInput.value = '';
+            boardNameError.classList.add('hidden');
+            joinBoardError.classList.add('hidden');
+            
+            sourceNameInput.value = '';
+            sourcePhoneInput.value = '';
+            whereInput.value = '';
+            whatInput.value = '';
+            assigneeInput.value = '';
+            eventInput.value = '';
+            categoryInput.value = '';
+            
+            currentCollectionPath = '';
+            currentBoardData = [];
+
+            if (userRole === 'admin') {
+                adminButton.classList.remove('hidden');
+            } else {
+                adminButton.classList.add('hidden');
+            }
+            archiveButton.classList.remove('hidden');
+        });
+
         addButton.addEventListener('click', async () => {
             const name = sanitizeInput(sourceNameInput.value.trim());
             const phone = sanitizeInput(sourcePhoneInput.value.trim());
             const where = sanitizeInput(whereInput.value.trim());
+            const event = sanitizeInput(eventInput.value.trim());
+            const category = sanitizeInput(categoryInput.value.trim());
             const what = sanitizeInput(whatInput.value.trim());
             const assignee = sanitizeInput(assigneeInput.value.trim());
         
-            if (!name || !phone || !where || !what || !assignee) {
+            if (!name || !phone || !where || !what || !assignee || !event || !category) {
                 showNotification("모든 필드를 입력해주세요.", true);
                 return;
             }
@@ -851,17 +1469,22 @@
                     where,
                     what,
                     assignee,
+                    event,
+                    category,
                     status: 'pending',
                     timestamp: serverTimestamp(),
+                    pendingTimestamp: serverTimestamp(), // Added pending timestamp
                     authorName: userName,
+                    authorId: userId
                 });
                 
-                // 입력 필드 초기화
                 sourceNameInput.value = '';
                 sourcePhoneInput.value = '';
                 whereInput.value = '';
                 whatInput.value = '';
-                assigneeInput.value = userName; // 담당자는 현재 사용자로 유지
+                assigneeInput.value = userName;
+                eventInput.value = '';
+                categoryInput.value = '';
                 
                 showNotification("요청이 성공적으로 추가되었습니다.");
             } catch (error) {
@@ -872,45 +1495,65 @@
             }
         });
 
-        returnToLobbyButton.addEventListener('click', () => {
-            lobbyScreen.classList.remove('hidden');
-            appContainer.classList.add('hidden');
-            if (unsubscribe) {
-                unsubscribe();
-            }
-            
-            // 입력 필드 초기화
-            boardNameInput.value = '';
-            joinBoardInput.value = '';
-            boardNameError.classList.add('hidden');
-            joinBoardError.classList.add('hidden');
-            
-            // 메인 앱 필드 초기화
-            sourceNameInput.value = '';
-            sourcePhoneInput.value = '';
-            whereInput.value = '';
-            whatInput.value = '';
-            assigneeInput.value = '';
-            
-            currentCollectionPath = '';
-            currentBoardData = [];
-        });
-
         downloadButton.addEventListener('click', downloadAsCsv);
 
-        // 키보드 단축키
+        addEventButton.addEventListener('click', async () => {
+            if (userRole !== 'admin') return showNotification("관리자만 추가할 수 있습니다.", true);
+            const newEvent = sanitizeInput(newEventInput.value.trim());
+            if (newEvent && !events.includes(newEvent)) {
+                events.push(newEvent);
+                await saveEvents();
+                newEventInput.value = '';
+                showNotification("새 행사가 추가되었습니다.");
+            } else {
+                showNotification("유효한 행사 이름을 입력해주세요.", true);
+            }
+        });
+
+        addCategoryButton.addEventListener('click', async () => {
+            if (userRole !== 'admin') return showNotification("관리자만 추가할 수 있습니다.", true);
+            const newCategory = sanitizeInput(newCategoryInput.value.trim());
+            if (newCategory && !categories.includes(newCategory)) {
+                categories.push(newCategory);
+                await saveCategories();
+                newCategoryInput.value = '';
+                showNotification("새 분류가 추가되었습니다.");
+            } else {
+                showNotification("유효한 분류 이름을 입력해주세요.", true);
+            }
+        });
+        
+        blockUserButton.addEventListener('click', async () => {
+            if (userRole !== 'admin') return showNotification("관리자만 차단/해제할 수 있습니다.", true);
+            const userToBlock = sanitizeInput(blockUserInput.value.trim());
+            if (userToBlock) {
+                const index = blockedUsers.indexOf(userToBlock);
+                if (index > -1) {
+                    blockedUsers.splice(index, 1);
+                    showNotification(`사용자 ${userToBlock}이(가) 차단 해제되었습니다.`);
+                } else {
+                    blockedUsers.push(userToBlock);
+                    showNotification(`사용자 ${userToBlock}이(가) 차단되었습니다.`);
+                }
+                await saveBlockedUsers();
+                blockUserInput.value = '';
+            } else {
+                showNotification("유효한 사용자 ID를 입력해주세요.", true);
+            }
+        });
+
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey) {
                 switch (e.key) {
                     case 'Enter':
                         e.preventDefault();
-                        if (!appContainer.classList.contains('hidden')) {
+                        if (!appContainer.classList.contains('hidden') && !mainUI.classList.contains('hidden')) {
                             addButton.click();
                         }
                         break;
                     case 's':
                         e.preventDefault();
-                        if (!appContainer.classList.contains('hidden')) {
+                        if (!appContainer.classList.contains('hidden') && !mainUI.classList.contains('hidden')) {
                             downloadButton.click();
                         }
                         break;
@@ -919,17 +1562,15 @@
             
             if (e.key === 'Escape') {
                 modal.classList.add('hidden');
+                if (!appContainer.classList.contains('hidden') && !mainUI.classList.contains('hidden')) {
+                    const editButtons = document.querySelector('.edit-buttons:not(.hidden)');
+                    if (editButtons) {
+                        editButtons.querySelector('.cancel-btn').click();
+                    }
+                }
             }
         });
 
-        // 페이지 언로드 시 정리
-        window.addEventListener('beforeunload', () => {
-            if (unsubscribe) {
-                unsubscribe();
-            }
-        });
-
-        // 온라인/오프라인 상태 감지
         window.addEventListener('online', () => {
             updateConnectionStatus(true);
             showNotification("인터넷에 연결되었습니다.");
